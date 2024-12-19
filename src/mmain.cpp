@@ -5,8 +5,7 @@
 #include <sstream>
 #include <string>
 
-class Shader { 
-    public:
+
 
 
         unsigned int ID;
@@ -25,17 +24,15 @@ class Shader {
             glLinkProgram(ID);
             checkShaderCompilation(ID, "PROGRAM");
 
+
             glDeleteShader(vertex);
             glDeleteShader(fragment);
-
         }
 
-        void Use() const{
+        void Use() {
             glUseProgram(ID);
         }
 
-
-    private:
         static std::string LoadShader(const std::string& filepath){
             std::ifstream file(filepath);
             if(!file.is_open()){
@@ -44,6 +41,7 @@ class Shader {
 
             std::stringstream buffer;
             buffer << file.rdbuf();
+            // returns the shader string
             return  buffer.str();
         }
 
@@ -56,12 +54,14 @@ class Shader {
                 glGetShaderiv(shader, GL_COMPILE_STATUS, &succcess);
                 if(!succcess){
                     glGetShaderInfoLog(shader, 512, NULL, infolog);
+                    // shader compilation error
                     std::cerr << "Compilation Failed " << type << infolog << std::endl;
                 }
             }else{
                 glGetShaderiv(shader, GL_LINK_STATUS, &succcess);
                 if(!succcess){
                     glGetShaderInfoLog(shader, sizeof(infolog) * sizeof(char), nullptr, infolog);
+                    // shader program compilation error
                     std::cerr << "Linking failed  " << type << "\n" << infolog << std::endl;
                 }
             }
@@ -77,7 +77,7 @@ class Shader {
             checkShaderCompilation(shader, type == GL_VERTEX_SHADER ?  "GL_VERTEX_SHADER" : "GL_FRAGMENT_SHADER");
         }
 
-};
+
 
 
 float treeVertices[] = {
@@ -178,20 +178,13 @@ int main(void) {
 
     treeObjects();
 
-    Shader shader;
 
     
-    GLuint uniTreeColour = glGetUniformLocation(Use(), "treeColour");
-    GLuint uniTrunkColour = glGetUniformLocation(shaderProgram, "treeColour");
-
 
     while (!glfwWindowShouldClose(window)) {
         glClearColor(0.67f, 0.84f, 1.0f, 1.0f); // light blue
         glClear(GL_COLOR_BUFFER_BIT);
-        
-        shader.ShaderCompile()
-        glUseProgram(shaderProgram);
-
+        LoadShader()
         glUniform4f(uniTreeColour, 0.0f, 1.0f, 0.0f, 1.0f);
         glBindVertexArray(treeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 9); 
