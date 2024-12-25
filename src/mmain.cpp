@@ -5,77 +5,77 @@
 #include <sstream>
 #include <string>
 
+class Shader{
+
+    public:
+    unsigned int ID;
+    void ShaderCompile(std::string& vPath, std::string& fPath){
+        std::string vertexCode = LoadShader(vPath);
+        std::string fragmentCode = LoadShader(fPath);
+
+        unsigned int vertex = CompileShader(GL_VERTEX_SHADER, vertexCode);
+        unsigned int fragment = CompileShader(GL_FRAGMENT_SHADER, fragmentCode);
+
+        ID = glCreateProgram();
+        glAttachShader(ID, vertex);
+        glAttachShader(ID, fragment);
+        glLinkProgram(ID);
+        checkShaderCompilation(ID, "PROGRAM");
 
 
+        glDeleteShader(vertex);
+        glDeleteShader(fragment);
+    }
 
-        unsigned int ID;
-
-
-        void ShaderCompile(std::string& vPath, std::string& fPath){
-            std::string vertexCode = LoadShader(vPath);
-            std::string fragmentCode = LoadShader(fPath);
-
-            unsigned int vertex = CompileShader(GL_VERTEX_SHADER, vertexCode);
-            unsigned int fragment = CompileShader(GL_FRAGMENT_SHADER, fragmentCode);
-
-            ID = glCreateProgram();
-            glAttachShader(ID, vertex);
-            glAttachShader(ID, fragment);
-            glLinkProgram(ID);
-            checkShaderCompilation(ID, "PROGRAM");
-
-
-            glDeleteShader(vertex);
-            glDeleteShader(fragment);
+    void Use() {
+        glUseProgram(ID);
+    }
+    private:
+    std::string LoadShader(const std::string& filepath){
+        std::ifstream file(filepath);
+        if(!file.is_open()){
+            throw std::runtime_error("Failed to Open Shader File" + filepath);
         }
 
-        void Use() {
-            glUseProgram(ID);
-        }
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        // returns the shader string
+        return  buffer.str();
+    }
 
-        static std::string LoadShader(const std::string& filepath){
-            std::ifstream file(filepath);
-            if(!file.is_open()){
-                throw std::runtime_error("Failed to Open Shader File" + filepath);
+
+    static void checkShaderCompilation(unsigned int shader, const std::string& type){
+        int succcess;
+        char infolog[512];
+        
+        if(type != "PROGRAM"){
+            glGetShaderiv(shader, GL_COMPILE_STATUS, &succcess);
+            if(!succcess){
+                glGetShaderInfoLog(shader, 512, NULL, infolog);
+                // shader compilation error
+                std::cerr << "Compilation Failed " << type << infolog << std::endl;
             }
-
-            std::stringstream buffer;
-            buffer << file.rdbuf();
-            // returns the shader string
-            return  buffer.str();
-        }
-
-
-        static void checkShaderCompilation(unsigned int shader, const std::string& type){
-            int succcess;
-            char infolog[512];
-            
-            if(type != "PROGRAM"){
-                glGetShaderiv(shader, GL_COMPILE_STATUS, &succcess);
-                if(!succcess){
-                    glGetShaderInfoLog(shader, 512, NULL, infolog);
-                    // shader compilation error
-                    std::cerr << "Compilation Failed " << type << infolog << std::endl;
-                }
-            }else{
-                glGetShaderiv(shader, GL_LINK_STATUS, &succcess);
-                if(!succcess){
-                    glGetShaderInfoLog(shader, sizeof(infolog) * sizeof(char), nullptr, infolog);
-                    // shader program compilation error
-                    std::cerr << "Linking failed  " << type << "\n" << infolog << std::endl;
-                }
+        }else{
+            glGetShaderiv(shader, GL_LINK_STATUS, &succcess);
+            if(!succcess){
+                glGetShaderInfoLog(shader, sizeof(infolog) * sizeof(char), nullptr, infolog);
+                // shader program compilation error
+                std::cerr << "Linking failed  " << type << "\n" << infolog << std::endl;
             }
-
-            
         }
-        static unsigned int CompileShader(unsigned int type, const std::string source){
-            unsigned int shader = glCreateShader(type);
-            const char* src = source.c_str();
-            glShaderSource(shader, 1 ,&src, nullptr);
-            glCompileShader(shader);
 
-            checkShaderCompilation(shader, type == GL_VERTEX_SHADER ?  "GL_VERTEX_SHADER" : "GL_FRAGMENT_SHADER");
-        }
+        
+    }
+    static unsigned int CompileShader(unsigned int type, const std::string source){
+        unsigned int shader = glCreateShader(type);
+        const char* src = source.c_str();
+        glShaderSource(shader, 1 ,&src, nullptr);
+        glCompileShader(shader);
+
+        checkShaderCompilation(shader, type == GL_VERTEX_SHADER ?  "GL_VERTEX_SHADER" : "GL_FRAGMENT_SHADER");
+        return shader;
+    }
+};
 
 
 
@@ -178,13 +178,20 @@ int main(void) {
 
     treeObjects();
 
+    std::string vertexPath = "../res/shaders/vertex.shader";
+    std::string fragmentPath = "../res/shaders/fragment.shader";
 
-    
+    Shader shader;
+    shader.ShaderCompile(vertexPath, fragmentPath);
+
+    unsigned int shaderProgram = shader.ID;
 
     while (!glfwWindowShouldClose(window)) {
         glClearColor(0.67f, 0.84f, 1.0f, 1.0f); // light blue
         glClear(GL_COLOR_BUFFER_BIT);
-        LoadShader()
+        shader.Use();
+        GLint uniTreeColour = glGetUniformLocation(shader.ID, "treeColour");
+        GLint uniTrunkColour = glGetUniformLocation(shader.ID, "trunkColour");
         glUniform4f(uniTreeColour, 0.0f, 1.0f, 0.0f, 1.0f);
         glBindVertexArray(treeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 9); 
