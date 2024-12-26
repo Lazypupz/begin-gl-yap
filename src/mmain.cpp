@@ -39,7 +39,7 @@ class Shader{
 
         std::stringstream buffer;
         buffer << file.rdbuf();
-        // returns the shader string
+        // returns the shader string but why is a shader a fucking string.
         return  buffer.str();
     }
 
@@ -67,6 +67,7 @@ class Shader{
         
     }
     static unsigned int CompileShader(unsigned int type, const std::string source){
+        //thr fuck is a c string? ?? ? ?? ? ?? 
         unsigned int shader = glCreateShader(type);
         const char* src = source.c_str();
         glShaderSource(shader, 1 ,&src, nullptr);
@@ -105,8 +106,12 @@ float trunkVertices[] = {
 };
 
 
-GLuint treeVBO, treeVAO, trunkVAO, trunkVBO;
+unsigned int indices[] = {
+    0, 1, 2, 3
+};
 
+
+unsigned int treeVAO, treeVBO, trunkVAO, trunkVBO, trunkIBO;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height){
     glViewport(0,0,width,height);
@@ -115,8 +120,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height){
 
 int initWinGLFW(GLFWwindow*& window) {
      
-    if (!glfwInit()) {
-        std::cerr << "Failed to init glfw" << std::endl;
+    if(!glfwInit()){
+        std::cerr << "Failed to init glfw...";
         return -1;
     }
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -168,6 +173,10 @@ void treeObjects() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
+
+    glGenBuffers(1, &trunkIBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, trunkIBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(trunkVertices), trunkVertices, GL_STATIC_DRAW);
     
 }
 
@@ -204,7 +213,7 @@ int main(void) {
         glfwPollEvents();
     }
 
-
+    
     glDeleteProgram(shaderProgram);
 
     glfwTerminate();
