@@ -107,6 +107,7 @@ float trunkVertices[] = {
 
 
 unsigned int indices[] = {
+    //ibo type shit
     0, 1, 2, 3
 };
 
@@ -198,9 +199,10 @@ int main(void) {
     while (!glfwWindowShouldClose(window)) {
         glClearColor(0.67f, 0.84f, 1.0f, 1.0f); // light blue
         glClear(GL_COLOR_BUFFER_BIT);
-        shader.Use();
         GLint uniTreeColour = glGetUniformLocation(shader.ID, "treeColour");
         GLint uniTrunkColour = glGetUniformLocation(shader.ID, "trunkColour");
+        shader.Use();
+
         glUniform4f(uniTreeColour, 0.0f, 1.0f, 0.0f, 1.0f);
         glBindVertexArray(treeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 9); 
