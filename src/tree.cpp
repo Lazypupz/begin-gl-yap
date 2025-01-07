@@ -67,7 +67,8 @@ class Shader{
         
     }
     static unsigned int CompileShader(unsigned int type, const std::string source){
-        //thr fuck is a c string? ?? ? ?? ? ?? 
+        //thr fuck is a c string? ?? ? ?? ? ??
+        //an array of chars 
         unsigned int shader = glCreateShader(type);
         const char* src = source.c_str();
         glShaderSource(shader, 1 ,&src, nullptr);
@@ -102,7 +103,7 @@ float trunkVertices[] = {
     -0.1f, -0.3f, 0.0f,  
     0.1f, -0.3f, 0.0f,  
     -0.1f, -0.7f, 0.0f,  
-    0.1f, -0.7f, 0.0f,  
+    1.1f, -0.7f, 0.0f,  
 };
 
 
@@ -119,40 +120,11 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height){
 }
 
 
-int initWinGLFW(GLFWwindow*& window) {
-     
-    if(!glfwInit()){
-        std::cerr << "Failed to init glfw...";
-        return -1;
-    }
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    
 
-    window = glfwCreateWindow(800, 600, "CHRISTMAS TREE", NULL, NULL);
-    if (!window) {
-        std::cerr << "Failed to display window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-
-
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-   
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        std::cerr << "failed to init GLAD" << std::endl;
-        return -1;
-    }
-    return 0;
-}
 
 
 
 void treeObjects() {
-
 
 
     glGenVertexArrays(1, &treeVAO);
@@ -221,5 +193,4 @@ int main(void) {
     glfwTerminate();
     return 0;
 }
-
 
