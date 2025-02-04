@@ -1,6 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <main.hpp>
+#include <main.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -157,7 +157,6 @@ void treeObjects() {
 int main(void) {
     
     GLFWwindow* window;
-    initWinGLFW(window);
 
     treeObjects();
 

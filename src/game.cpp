@@ -1,12 +1,17 @@
 
-#include <game.hpp>
+#include "game.hpp"
 
 
-GLFWwindow* window;
+
 Game::Game()
 {
     initWin();
 }
+
+GLFWwindow* window;
+
+
+
 
 int Game::initWin(){
     if(!glfwInit){ 
@@ -25,15 +30,25 @@ int Game::initWin(){
     }
     glfwGetCurrentContext();
 
-
     if(!gladLoadGLLoader(GLADloadproc(glfwGetProcAddress))){
         std::cerr << "NO GLAD" << std::endl;
         return -1;
     }
 
     while(!glfwWindowShouldClose){
+        glClearColor(1.0f,0.0f,0.0f,1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+
 
     }
+    glfwTerminate();
+    return 0;
 }
 
+int main(){
+    Game();
+}
 
